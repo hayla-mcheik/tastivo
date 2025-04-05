@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
+use Inertia\Inertia;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,8 +20,16 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
+    public function boot()
     {
-        //
+        Inertia::share([
+            'cartCount' => function () {
+                if (Auth::check()) {
+                    return Auth::user()->cartItems()->count();
+                }
+    
+                return \App\Models\Cart::where('session_id', Session::getId())->count();
+            },
+        ]);
     }
 }

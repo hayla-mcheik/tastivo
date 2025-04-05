@@ -6,6 +6,7 @@
         "build": "vite build"
     },
     "devDependencies": {
+        "@tailwindcss/forms": "^0.5.10",
         "@vitejs/plugin-vue": "^5.1.2",
         "autoprefixer": "^10.4.20",
         "axios": "^1.6.4",
@@ -16,6 +17,9 @@
     },
     "dependencies": {
         "@inertiajs/vue3": "^1.2.0",
-        "vue": "^3.4.38"
+        "flowbite": "^3.1.2",
+        "vue": "^3.4.38",
+        "vue-i18n": "^10.0.6",
+        "vue3-toastify": "^0.2.8"
     }
 }

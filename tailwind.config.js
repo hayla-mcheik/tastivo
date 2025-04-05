@@ -1,13 +1,22 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode:'selector',
   content: [
     "./resources/**/*.blade.php",
     "./resources/**/*.js",
     "./resources/**/*.vue",
+     "../node_modules/flowbite"
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        Montserrat : ["Montserrat", 'sans-serif']
+      }
+    },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/forms'),
+    require('flowbite/plugin'),  
+  ],
 }
 

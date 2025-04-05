@@ -1,7 +1,17 @@
-<script setup></script>
+<script setup>
+
+import HeroSlider from '../Components/HeroSlider.vue'
+import Menusliders from '../Components/menusliders.vue';
+import PopularProducts from '../Components/PopularProducts.vue';
+defineProps({
+sliders:Object,
+products:Object,
+categories:Object,
+});
+
+</script>
 
 <template>
-    <header>
-        <p>This is a simple starter kit for Laravel 11, Inertia JS, and Vue JS, without authentication. Tailwind and ZiggyVue are installed.</p>
-    </header>
+<Menusliders :categories="categories"/>
+<PopularProducts :products="products" :categories="categories"/>
 </template>
