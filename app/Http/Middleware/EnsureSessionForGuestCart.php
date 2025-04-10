@@ -5,9 +5,8 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Support\Facades\Auth;
 
-class MigrateGuestCart
+class EnsureSessionForGuestCart
 {
     /**
      * Handle an incoming request.
@@ -16,14 +15,16 @@ class MigrateGuestCart
      */
     public function handle(Request $request, Closure $next)
     {
-        $response = $next($request);
-        
-        if (Auth::check() && session()->has('cart_migrated') === false) {
-            $request->session()->put('cart_migrated', true);
-            // app('App\Http\Controllers\CartController')->migrateCart($request);
+        if (!auth()->check()) {
+            // Ensure session exists for guests
+            if (!$request->hasSession()) {
+                $request->session()->regenerate();
+            }
+            
+            // Optionally set a session flag for guest users
+            $request->session()->put('is_guest', true);
         }
         
-        return $response;
+        return $next($request);
     }
-
 }

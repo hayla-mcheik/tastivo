@@ -31,7 +31,7 @@ const revertImageChange = () => {
     <div>
         <span
             class="block text-sm font-medium text-slate-700 dark:text-slate-300"
-            :class="{ '!text-red-500': oversizedImage }"
+            :class="{ '!text-red-600': oversizedImage }"
         >
             {{
                 oversizedImage

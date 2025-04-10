@@ -2,10 +2,48 @@
 import { switchTheme } from "../Pages/theme";
 import NavLink from "../Components/NavLink.vue";
 import InputField from "../Components/InputField.vue";
-import { usePage } from "@inertiajs/vue3";
+import { Link, usePage } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
 import logoDark from '../../../public/assets/img/logo-dark.svg';
 import Footer from "../Components/Footer.vue";
+import { useI18n } from 'vue-i18n';
+import {  watch } from 'vue';
+
+const { t, locale } = useI18n();
+
+// Available languages
+const availableLocales = [
+    { code: 'en-US', name: 'English', flag: 'gb' },
+    { code: 'fr-FR', name: 'Français', flag: 'fr' },
+    { code: 'ar-AR', name: 'العربية', flag: 'ae' }
+];
+
+// Change language function
+const changeLanguage = (langCode) => {
+    locale.value = langCode;
+    localStorage.setItem('locale', langCode);
+    document.documentElement.lang = langCode;
+    
+    // Set direction for RTL languages (like Arabic)
+    if (langCode === 'ar-AR') {
+        document.documentElement.dir = 'rtl';
+    } else {
+        document.documentElement.dir = 'ltr';
+    }
+};
+
+// Initialize on component mount
+const initializeLanguage = () => {
+    const savedLocale = localStorage.getItem('locale') || 'ar-AR';
+    locale.value = savedLocale;
+    document.documentElement.lang = savedLocale;
+    
+    if (savedLocale === 'ar-AR') {
+        document.documentElement.dir = 'rtl';
+    }
+};
+
+initializeLanguage();
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
@@ -150,10 +188,10 @@ const show = ref(false);
         <div class="header-bottom-bg-wrapper to-be-sticky">
             <div class="ul-header-bottom">
                 <div class="ul-header-bottom-wrapper ul-header-container">
-                    <div class="logo-container">
-                        <a href="index.html" class="d-inline-block"> 
+                    <div class="logo-containerr w-50">
+                        <Link href="/" class="d-inline-block w-50"> 
                           <img src="/public/assets/img/logo.png" class="w-full" />
-                          </a>
+                        </Link>
                           <div>
                 
                           </div>
@@ -173,16 +211,19 @@ const show = ref(false);
                         </div>
                     </div>
                     <div class="ul-header-actions">
-                    <div class="toggle-language d-flex items-center gap-2">
-                        <a href="#" @click.prevent="changeLanguage('en')" class="language-option">
-    <span class="fi fi-gb text-sm"></span> <!-- UK Flag -->
-</a>
-<a href="#" @click.prevent="changeLanguage('ar')" class="language-option">
-    <span class="fi fi-ae text-sm"></span> <!-- UAE Flag for Arabic -->
-</a>
-
-            </div>
-</div>
+        <div class="toggle-language d-flex items-center gap-2">
+            <a 
+                v-for="lang in availableLocales" 
+                :key="lang.code"
+                href="#" 
+                @click.prevent="changeLanguage(lang.code)" 
+                class="language-option"
+                :class="{ 'active': locale === lang.code }"
+            >
+                <span :class="`fi fi-${lang.flag} text-sm`"></span>
+            </a>
+        </div>
+    </div>
 
 
           
@@ -203,3 +244,18 @@ const show = ref(false);
     <!-- FOOTER SECTION END -->
 
 </template>
+
+<style scoped>
+.language-option {
+    padding: 5px;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+.language-option:hover {
+    background-color: #f0f0f0;
+}
+.language-option.active {
+    background-color: #e0e0e0;
+    border: 1px solid #ccc;
+}
+</style>
