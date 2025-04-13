@@ -20,4 +20,8 @@ protected $fillable = [
     {
         return $this->hasMany(Cart::class);
     }
+    public function additions()
+    {
+        return $this->belongsToMany(Addition::class, 'product_additions');
+    }
 }

@@ -14,9 +14,12 @@ class Cart extends Model
         'session_id',
         'product_id',
         'price',
-        'quantity'
+        'quantity',
+         'additions'
     ];
-
+    protected $casts = [
+        'additions' => 'array'
+    ];
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -25,5 +28,29 @@ class Cart extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+    public function getAdditionsAttribute($value)
+    {
+        return $value ? json_decode($value, true) : [];
+    }
+
+    public function setAdditionsAttribute($value)
+    {
+        $this->attributes['additions'] = json_encode($value);
+    }
+
+    public function getAdditionsTotalAttribute()
+    {
+        if (empty($this->additions)) {
+            return 0;
+        }
+
+        $additions = Addition::whereIn('id', $this->additions)->get();
+        return $additions->sum('price');
+    }
+
+    public function getTotalPriceAttribute()
+    {
+        return ($this->price * $this->quantity) + $this->additions_total;
     }
 }

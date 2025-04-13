@@ -1,6 +1,7 @@
 <template>
+  <div class="ul-shop-container">
     <div 
-      class="relative w-full overflow-hidden hero-slider"
+      class="relative w-full overflow-hidden hero-slider rounded-2xl my-4"
       @touchstart="handleTouchStart"
       @touchmove="handleTouchMove"
       @touchend="handleTouchEnd"
@@ -15,13 +16,13 @@
         <div 
           v-for="(category, index) in categories"
           :key="index"
-          class="flex-shrink-0"
+          class="flex-shrink-0 hero-slider"
           :style="{ width: '100%' }"
         >
-          <div class="bg-whiteshadow-md overflow-hidden h-full hero-slider">
+          <div class="bg-whiteshadow-md overflow-hidden h-full ">
             <img 
               :src="`storage/${category.image}`" 
-              class="w-full h-[12rem] md:h-48 object-cover"
+              class="w-full h-[12rem] md:h-48 object-cover "
               :alt="category.name"
             >
    
@@ -50,6 +51,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
       </button>
+    </div>
     </div>
   </template>
   

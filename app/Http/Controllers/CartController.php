@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
+use App\Models\Addition;
 use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -10,110 +12,240 @@ use Inertia\Inertia;
 
 class CartController extends Controller
 {
-
-
     public function index(Request $request)
     {
-        $cartItems = Auth::check()
-            ? Auth::user()->cartItems()->with('product')->get()
-            : Cart::with('product')->where('session_id', $request->session()->getId())->get();
-
-        $total = $cartItems->sum(function ($item) {
-            return $item->price * $item->quantity;
-        });
-
-        return Inertia::render('Frontend/Cart', [
+        // Handle both authenticated and guest users
+        if (Auth::check()) {
+            $cartItems = Auth::user()->cartItems()->with('product')->get();
+        } else {
+            // Ensure we have a session ID
+            $sessionId = $request->session()->getId();
+            $cartItems = Cart::with('product')
+                ->where('session_id', $sessionId)
+                ->get();
+                
+            // Create new session if needed
+            if (!$request->hasSession()) {
+                $request->session()->regenerate();
+            }
+        }
+        
+        return Inertia::render('Cart', [
             'cartItems' => $cartItems,
-            'cartTotal' => $total,
-            'itemsCount' => $cartItems->count()
+            'cartTotal' => $this->calculateTotal($cartItems),
+            'itemsCount' => $cartItems->sum('quantity'),
+            'isGuest' => !Auth::check()
         ]);
     }
-
     public function addToCart(Request $request)
     {
         $validated = $request->validate([
             'product_id' => 'required|integer|exists:products,id',
-            'quantity' => 'required|integer|min:1|max:10'
+            'quantity' => 'required|integer|min:1|max:10',
+            'additions' => 'nullable|array',
+            'additions.*' => 'exists:additions,id'
         ]);
-
-        $product = Product::findOrFail($validated['product_id']);
-
-        if (Auth::check() && Auth::user()->isAdmin()) {
-            return response()->json(['message' => 'Admins cannot add items to cart'], 403);
+    
+        $product = Product::with('additions')->findOrFail($validated['product_id']);
+    
+        // Prepare additions data
+        $additionsData = [];
+        if (!empty($validated['additions'])) {
+            $additions = Addition::whereIn('id', $validated['additions'])->get();
+            $additionsData = $additions->map(function($addition) {
+                return [
+                    'id' => $addition->id,
+                    'name' => $addition->name,
+                    'price' => $addition->price
+                ];
+            })->toArray();
         }
-
-        $cartData = [
-            'product_id' => $product->id,
-            'price' => $product->price,
-            'quantity' => $validated['quantity']
-        ];
-
-        if (Auth::check()) {
-            $cartItem = Auth::user()->cartItems()
-                ->where('product_id', $product->id)
-                ->first();
-
-            if ($cartItem) {
-                $cartItem->increment('quantity', $validated['quantity']);
-            } else {
-                Auth::user()->cartItems()->create($cartData);
-            }
+    
+        // Check if product already in cart
+        $cartItem = Cart::where([
+            'user_id' => auth()->id() ?? null,
+            'session_id' => auth()->guest() ? session()->getId() : null,
+            'product_id' => $product->id
+        ])->first();
+    
+        if ($cartItem) {
+            $cartItem->update([
+                'quantity' => $cartItem->quantity + $validated['quantity'],
+                'additions' => $additionsData
+            ]);
         } else {
-            $cartItem = Cart::where('session_id', $request->session()->getId())
-                ->where('product_id', $product->id)
-                ->first();
-
-            if ($cartItem) {
-                $cartItem->increment('quantity', $validated['quantity']);
-            } else {
-                $cartData['session_id'] = $request->session()->getId();
-                Cart::create($cartData);
-            }
+            $cartItem = Cart::create([
+                'user_id' => auth()->id() ?? null,
+                'session_id' => auth()->guest() ? session()->getId() : null,
+                'product_id' => $product->id,
+                'price' => $product->price,
+                'quantity' => $validated['quantity'],
+                'additions' => $additionsData
+            ]);
         }
-
-        $cartCount = Auth::check()
-            ? Auth::user()->cartItemsCount()
-            : Cart::where('session_id', $request->session()->getId())->count();
-
+    
+        // Get all cart items for the current user/session
+        $cartItems = Cart::with('product')
+            ->where('user_id', auth()->id() ?? null)
+            ->where('session_id', auth()->guest() ? session()->getId() : null)
+            ->get();
+    
         return response()->json([
-            'message' => 'Product added to cart',
-            'cart_count' => $cartCount
+            'items' => $cartItems,
+            'count' => $cartItems->sum('quantity'),
+            'total' => $this->calculateTotal($cartItems),
+            'isGuest' => auth()->guest()
         ]);
     }
-
-    public function removeFromCart(Request $request, Cart $cartItem)
+    public function removeFromCart(Cart $cartItem)
     {
-        // Verify ownership
-        if (Auth::check()) {
-            if ($cartItem->user_id !== Auth::id()) {
-                abort(403);
-            }
-        } else {
-            if ($cartItem->session_id !== $request->session()->getId()) {
-                abort(403);
-            }
+        if ($cartItem->user_id !== Auth::id()) {
+            abort(403);
         }
 
         $cartItem->delete();
 
-        return back()->with('success', 'Item removed from cart');
+        return $this->index(request());
     }
 
     public function updateQuantity(Request $request, Cart $cartItem)
     {
+        if ($cartItem->user_id !== Auth::id()) {
+            abort(403);
+        }
+
         $validated = $request->validate([
-            'quantity' => 'required|integer|min:1|max:10'
+            'quantity' => 'required|integer|min:1|max:10',
+            'additions' => 'nullable|array',
+            'additions.*' => 'exists:additions,id'
         ]);
 
-        // Verify ownership (same as removeFromCart)
-        // ...
+        $cartItem->update([
+            'quantity' => $validated['quantity'],
+            'additions' => $validated['additions'] ?? $cartItem->additions
+        ]);
 
-        $cartItem->update(['quantity' => $validated['quantity']]);
+        return $this->index($request);
+    }
+
+    // Guest cart methods
+    public function guestIndex(Request $request)
+    {
+        $cartItems = Cart::with(['product', 'product.additions'])
+            ->where('session_id', $request->session()->getId())
+            ->get();
 
         return response()->json([
-            'message' => 'Quantity updated',
-            'item_total' => $cartItem->price * $cartItem->quantity
+            'items' => $cartItems,
+            'total' => $this->calculateTotal($cartItems),
+            'count' => $cartItems->sum('quantity')
         ]);
     }
 
+    public function guestAddToCart(Request $request)
+    {
+        $validated = $request->validate([
+            'product_id' => 'required|integer|exists:products,id',
+            'quantity' => 'required|integer|min:1|max:10',
+            'additions' => 'nullable|array',
+            'additions.*' => 'exists:additions,id'
+        ]);
+
+        $product = Product::with('additions')->findOrFail($validated['product_id']);
+
+        $cartItem = Cart::where('session_id', $request->session()->getId())
+            ->where('product_id', $product->id)
+            ->first();
+
+        if ($cartItem) {
+            $cartItem->increment('quantity', $validated['quantity']);
+            $cartItem->update(['additions' => $validated['additions'] ?? []]);
+        } else {
+            Cart::create([
+                'session_id' => $request->session()->getId(),
+                'product_id' => $product->id,
+                'price' => $product->price,
+                'quantity' => $validated['quantity'],
+                'additions' => $validated['additions'] ?? []
+            ]);
+        }
+
+        return $this->guestIndex($request);
+    }
+
+    public function guestRemoveFromCart(Request $request, Cart $cartItem)
+    {
+        if ($cartItem->session_id !== $request->session()->getId()) {
+            abort(403);
+        }
+
+        $cartItem->delete();
+
+        return $this->guestIndex($request);
+    }
+
+// In CartController.php
+
+
+public function guestClearCart(Request $request)
+{
+    try {
+        $sessionId = $request->session()->getId();
+        $deleted = Cart::where('session_id', $sessionId)->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => $deleted > 0 
+                ? 'Cart cleared successfully!' 
+                : 'Your cart was already empty',
+            'items' => [],
+            'count' => 0,
+            'total' => 0
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to clear cart',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+    public function guestUpdateQuantity(Request $request, Cart $cartItem)
+    {
+        if ($cartItem->session_id !== $request->session()->getId()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'quantity' => 'required|integer|min:1|max:10',
+            'additions' => 'nullable|array',
+            'additions.*' => 'exists:additions,id'
+        ]);
+
+        $cartItem->update([
+            'quantity' => $validated['quantity'],
+            'additions' => $validated['additions'] ?? $cartItem->additions
+        ]);
+
+        return $this->guestIndex($request);
+    }
+
+    protected function calculateTotal($items)
+    {
+        return $items->reduce(function ($total, $item) {
+            $additionsTotal = 0;
+            
+            if (!empty($item->additions)) {
+                $additions = Addition::whereIn('id', $item->additions)->get();
+                $additionsTotal = $additions->sum('price') * $item->quantity;
+            }
+            
+            return $total + ($item->price * $item->quantity) + $additionsTotal;
+        }, 0);
+    }
+    public function additions()
+    {
+        return Addition::all(); // or you can return specific fields
+    }
 }

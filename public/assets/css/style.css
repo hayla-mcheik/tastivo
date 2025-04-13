@@ -44,7 +44,7 @@ CSS INDEX
 :root {
   --black: #000;
   --white: #fff;
-  --ul-primary: #EB0029;
+  --ul-primary: rgb(220 38 38);
   --ul-secondary: #FAA019;
   --ul-c3: #FFE9C8;
   --ul-c4: #FFF9F4;
@@ -231,8 +231,8 @@ button {
 }
 
 .ul-section-spacing {
-  padding-top: clamp(20px, 6.31vw, 120px);
-  padding-bottom: clamp(20px, 6.31vw, 120px);
+  padding-top: 2%;
+  padding-bottom: 0;
 }
 
 .wow {
@@ -4354,7 +4354,7 @@ button {
   color: var(--black);
 }
 .ul-checkout-form-btn {
-  background-color: #EB0029;
+  background-color: rgb(220 38 38);
   height: clamp(45px, 2.89vw, 55px);
   color: var(--white);
   font-weight: 600;
@@ -4378,10 +4378,10 @@ button {
   margin-bottom: clamp(25px, 2.63vw, 50px);
 }
 .ul-checkout-payment-methods label input[type=radio]:checked ~ .ul-radio-wrapper {
-  border-color: #EB0029;
+  border-color: rgb(220 38 38);
 }
 .ul-checkout-payment-methods label input[type=radio]:checked ~ .ul-radio-wrapper::before {
-  background-color: #EB0029;
+  background-color: rgb(220 38 38);
 }
 .ul-checkout-payment-method .title {
   font-weight: 600;
@@ -5318,7 +5318,7 @@ button {
   --tw-gradient-from: #9d0606 var(--tw-gradient-from-position);
 }
 .ul-food-image{
-  height: 100px;
+  height: 106px;
   width: 100%;
   border-radius: 0px;
   background-color: #f2f2f2;
@@ -5341,7 +5341,7 @@ height: 50px;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #0000000f;
+  background-color:#0000000a ;
 }
 .ul-food-image::before{
   position: absolute;
@@ -5350,5 +5350,5 @@ height: 50px;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #00000070;
+  background-color: #0000002b;
 }

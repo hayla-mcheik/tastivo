@@ -8,22 +8,26 @@ import Main from "./Layouts/Main.vue";
 import AdminLayout from "./Layouts/AdminLayout.vue";
 import { createI18n } from "vue-i18n";
 import english from "./langs/english";
+import arabic from "./langs/arabic";
+import french from "./langs/french";
+import { createPinia } from "pinia";
+import router from "./router";
+
+// Add this right after your imports in main.js
+axios.defaults.withCredentials = true;
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '';
+const pinia = createPinia();
 
 const i18n = createI18n({
     legacy: false,
-    locale: "ar-AR",
-    fallbackLocale: "en",
+    locale: localStorage.getItem('locale') || "ar-AR", // Get saved locale or default to Arabic
+    fallbackLocale: "en-US",
     messages: {
         "en-US": english.messages,
-        "fr-FR": english.messages,
-        "ar-AR": english.messages,
+        "fr-FR": french.messages,
+        "ar-AR": arabic.messages,
     },
-});
-
-// Create reactive cart state
-const cartState = ref({
-    count: 0,
-    isAnimating: false
 });
 
 createInertiaApp({
@@ -42,66 +46,15 @@ createInertiaApp({
     setup({ el, App, props, plugin }) {
         const vueApp = createApp({ 
             render: () => h(App, props),
-            setup() {
-                // Provide cart state management functions
-                const triggerCartAnimation = () => {
-                    cartState.value.isAnimating = true;
-                    setTimeout(() => {
-                        cartState.value.isAnimating = false;
-                    }, 1000);
-                };
-
-                const updateCartCount = (count) => {
-                    cartState.value.count = count;
-                };
-
-                return {
-                    cartState,
-                    triggerCartAnimation,
-                    updateCartCount
-                };
-            }
         })
         .use(plugin)
+        .use(pinia)
+        .use(router)
         .use(ZiggyVue)
         .component("Head", Head)
         .component("Link", Link)
         .use(i18n);
-
-        // Add global mixin for cart functionality
-        vueApp.mixin({
-            mounted() {
-                if (!this.$page.props.auth?.user?.is_admin) {
-                    this.fetchCartCount();
-                }
-            },
-            methods: {
-                async fetchCartCount() {
-                    try {
-                        const response = await axios.get(route('cart.count'));
-                        this.updateCartCount(response.data.count);
-                    } catch (error) {
-                        console.error('Error fetching cart count:', error);
-                    }
-                },
-                async addToCart(productId, quantity = 1) {
-                    try {
-                        await axios.post(route('cart.add'), {
-                            product_id: productId,
-                            quantity: quantity
-                        });
-                        this.triggerCartAnimation();
-                        this.updateCartCount(this.cartState.count + quantity);
-                    } catch (error) {
-                        if (error.response?.data?.message === 'Please login to add items to cart') {
-                            window.location.href = route('login');
-                        }
-                        console.error('Error adding to cart:', error);
-                    }
-                }
-            }
-        });
-
+        
         vueApp.mount(el);
     },
     progress: {
