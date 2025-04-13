@@ -11,6 +11,12 @@ class Category extends Model
         'name', 'slug', 'status'
     ]; 
     use HasFactory;
+
+    public function restaurant()
+    {
+        return $this->belongsTo(Restaurant::class);
+    }
+
     public function products()
     {
         return $this->hasMany(Product::class);

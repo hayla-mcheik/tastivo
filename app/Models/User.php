@@ -72,4 +72,9 @@ class User extends Authenticatable implements MustVerifyEmail
             return $item->price * $item->quantity;
         });
     }
+    
+    public function restaurant()
+    {
+        return $this->hasOne(Restaurant::class);
+    }
 }

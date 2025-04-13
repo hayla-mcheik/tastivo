@@ -7,6 +7,7 @@ use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\ListingController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RestaurantController;
 use App\Http\Middleware\Admin;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,14 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'updateInfo'])->name('profile.info');
     Route::put('/profile', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/restaurants', [RestaurantController::class, 'index'])->name('restaurant.index');
+    Route::get('/restaurants/create', [RestaurantController::class, 'create'])->name('restaurant.create');
+    Route::post('/restaurants/store', [RestaurantController::class, 'store'])->name('restaurant.store');
+    Route::get('/restaurants/{id}', [RestaurantController::class, 'show'])->name('restaurant.show');
+    Route::get('/restaurants/edit/{id}', [RestaurantController::class, 'edit'])->name('restaurant.edit');
+    Route::put('/restaurants/update/{id}', [RestaurantController::class, 'update'])->name('restaurant.update');
+    Route::get('/restaurants/destroy/{id}', [RestaurantController::class, 'destroy'])->name('restaurant.destroy');
 });
 
 
