@@ -10,6 +10,8 @@ use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\ListingController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RestaurantController;
+use App\Http\Controllers\SearchController;
 use App\Http\Middleware\Admin;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
