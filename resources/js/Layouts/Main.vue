@@ -8,7 +8,7 @@ import logoDark from '../../../public/assets/img/logo-dark.svg';
 import Footer from "../Components/Footer.vue";
 import { useI18n } from 'vue-i18n';
 import {  watch } from 'vue';
-
+import CartInitializer from '../Components/CartInitializer.vue';
 const { t, locale } = useI18n();
 
 // Available languages
@@ -50,6 +50,7 @@ const user = computed(() => page.props.auth.user);
 
 const cartCount = usePage().props.cartCount
 const show = ref(false);
+
 </script>
 
 <template>
@@ -188,8 +189,9 @@ const show = ref(false);
         <div class="header-bottom-bg-wrapper to-be-sticky">
             <div class="ul-header-bottom">
                 <div class="ul-header-bottom-wrapper ul-header-container">
-                    <div class="logo-containerr w-50">
-                        <Link href="/" class="d-inline-block w-50"> 
+                    <div class="logo-containerr w-1/2 md:w-1/4">
+                        <Link href="/" class="block w-1/2 md:w-[80px]">
+
                           <img src="/public/assets/img/logo.png" class="w-full" />
                         </Link>
                           <div>
@@ -200,13 +202,9 @@ const show = ref(false);
                               <div class="ul-header-nav-wrapper">
                         <div class="to-go-to-sidebar-in-mobile">
                             <nav class="ul-header-nav">
-                                <NavLink routeName="home" componentName="Home" class="m-4">
-           <h2 class="text-white">H_Genius</h2>
-                </NavLink>
+         
 
-                <div class="bg-gray-100 w-full">
-                    <a>dskj</a>
-                </div>
+          
                             </nav>
                         </div>
                     </div>
@@ -242,7 +240,7 @@ const show = ref(false);
         <!-- FOOTER SECTION START -->
 <Footer :cart-count="cartCount" />
     <!-- FOOTER SECTION END -->
-
+    <CartInitializer />
 </template>
 
 <style scoped>

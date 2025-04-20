@@ -3,17 +3,17 @@ import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-const { t, locale } = useI18n(); // Make sure to destructure locale here
+const { t, locale } = useI18n(); 
 
 defineProps({
     products: Object,
     categories: Object,
 });
 
-// Extract language code (en-US → en)
+
 const currentLang = computed(() => locale.value.split('-')[0]);
 
-// Get translated name
+
 const translatedName = (category) => {
     if (category.translations && category.translations.length) {
         const translation = category.translations.find(t => t.locale === currentLang.value);

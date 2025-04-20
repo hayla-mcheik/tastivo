@@ -1,17 +1,34 @@
 <script setup>
 
-import HeroSlider from '../Components/HeroSlider.vue'
 import Menusliders from '../Components/menusliders.vue';
 import PopularProducts from '../Components/PopularProducts.vue';
-defineProps({
-sliders:Object,
-products:Object,
-categories:Object,
-});
+import DesktopLayout from '../Components/DesktopLayout.vue';
 
+defineProps({
+  sliders: Object,
+  products: Object,
+  categories: Object,
+});
 </script>
 
 <template>
-<Menusliders :categories="categories"/>
-<PopularProducts :products="products" :categories="categories"/>
+  <!-- Mobile layout -->
+  <div class="block md:hidden">
+    <Menusliders :categories="categories"/>
+    <PopularProducts :products="products" :categories="categories"/>
+  </div>
+<div class="hidden md:flex">
+  <!-- Desktop layout -->
+  <DesktopLayout 
+    :categories="categories"
+  />
+  <div class="flex md:hidden">
+  <!-- Popular products shown below on both layouts -->
+  <PopularProducts 
+    class="mt-8"
+    :products="products" 
+    :categories="categories"
+  />
+  </div>
+  </div>
 </template>

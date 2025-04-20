@@ -5308,7 +5308,7 @@ button {
 } */
 
 .header-bottom-bg-wrapper{
-  padding: 2%;
+  padding: 1%;
   background-color: white;
 }
 .custom-gradient-to {
@@ -5351,4 +5351,7 @@ height: 50px;
   right: 0;
   bottom: 0;
   background-color: #0000002b;
+}
+.ul-banner{
+  display: none;
 }

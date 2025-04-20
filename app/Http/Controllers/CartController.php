@@ -150,29 +150,41 @@ class CartController extends Controller
             'additions' => 'nullable|array',
             'additions.*' => 'exists:additions,id'
         ]);
-
+    
         $product = Product::with('additions')->findOrFail($validated['product_id']);
-
+    
+        // Prepare additions data with names and prices
+        $additionsData = [];
+        if (!empty($validated['additions'])) {
+            $additions = Addition::whereIn('id', $validated['additions'])->get();
+            $additionsData = $additions->map(function($addition) {
+                return [
+                    'id' => $addition->id,
+                    'name' => $addition->name,
+                    'price' => $addition->price
+                ];
+            })->toArray();
+        }
+    
         $cartItem = Cart::where('session_id', $request->session()->getId())
             ->where('product_id', $product->id)
             ->first();
-
+    
         if ($cartItem) {
             $cartItem->increment('quantity', $validated['quantity']);
-            $cartItem->update(['additions' => $validated['additions'] ?? []]);
+            $cartItem->update(['additions' => $additionsData]);
         } else {
             Cart::create([
                 'session_id' => $request->session()->getId(),
                 'product_id' => $product->id,
                 'price' => $product->price,
                 'quantity' => $validated['quantity'],
-                'additions' => $validated['additions'] ?? []
+                'additions' => $additionsData
             ]);
         }
-
+    
         return $this->guestIndex($request);
     }
-
     public function guestRemoveFromCart(Request $request, Cart $cartItem)
     {
         if ($cartItem->session_id !== $request->session()->getId()) {
@@ -211,34 +223,56 @@ public function guestClearCart(Request $request)
         ], 500);
     }
 }
-    public function guestUpdateQuantity(Request $request, Cart $cartItem)
-    {
-        if ($cartItem->session_id !== $request->session()->getId()) {
-            abort(403);
-        }
-
-        $validated = $request->validate([
-            'quantity' => 'required|integer|min:1|max:10',
-            'additions' => 'nullable|array',
-            'additions.*' => 'exists:additions,id'
-        ]);
-
-        $cartItem->update([
-            'quantity' => $validated['quantity'],
-            'additions' => $validated['additions'] ?? $cartItem->additions
-        ]);
-
-        return $this->guestIndex($request);
+public function guestUpdateQuantity(Request $request, Cart $cartItem)
+{
+    if ($cartItem->session_id !== $request->session()->getId()) {
+        abort(403);
     }
 
+    $validated = $request->validate([
+        'quantity' => 'required|integer|min:1|max:10',
+        'additions' => 'nullable|array',
+        'additions.*' => 'exists:additions,id'
+    ]);
+
+    // Prepare additions data if provided
+    $additionsData = $cartItem->additions; // Keep existing if not provided
+    if (isset($validated['additions'])) {
+        $additions = Addition::whereIn('id', $validated['additions'])->get();
+        $additionsData = $additions->map(function($addition) {
+            return [
+                'id' => $addition->id,
+                'name' => $addition->name,
+                'price' => $addition->price
+            ];
+        })->toArray();
+    }
+
+    $cartItem->update([
+        'quantity' => $validated['quantity'],
+        'additions' => $additionsData
+    ]);
+
+    return $this->guestIndex($request);
+}
     protected function calculateTotal($items)
     {
         return $items->reduce(function ($total, $item) {
             $additionsTotal = 0;
             
+            // Handle both array of IDs and array of addition objects
             if (!empty($item->additions)) {
-                $additions = Addition::whereIn('id', $item->additions)->get();
-                $additionsTotal = $additions->sum('price') * $item->quantity;
+                // If additions is an array of IDs
+                if (is_array($item->additions) && count($item->additions) > 0 && is_numeric($item->additions[0])) {
+                    $additions = Addition::whereIn('id', $item->additions)->get();
+                    $additionsTotal = $additions->sum('price') * $item->quantity;
+                } 
+                // If additions is an array of objects with price
+                else if (is_array($item->additions) && count($item->additions) > 0 && isset($item->additions[0]['price'])) {
+                    $additionsTotal = array_reduce($item->additions, function($sum, $addition) {
+                        return $sum + $addition['price'];
+                    }, 0) * $item->quantity;
+                }
             }
             
             return $total + ($item->price * $item->quantity) + $additionsTotal;

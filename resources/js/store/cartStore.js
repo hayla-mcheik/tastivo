@@ -13,30 +13,48 @@ export const useCartStore = defineStore('cart', {
     }),
     actions: {
         async initialize() {
-            this.isLoading = true;
+            // First check localStorage for guest cart
+            const localCart = localStorage.getItem('guestCart');
+            if (localCart) {
+                try {
+                    const parsed = JSON.parse(localCart);
+                    this.updateCartState(parsed);
+                } catch (e) {
+                    console.error('Failed to parse local cart', e);
+                }
+            }
+
             try {
                 await axios.get('/sanctum/csrf-cookie');
                 
                 try {
+                    // Try authenticated user first
                     const response = await axios.get('/api/cart');
                     this.updateCartState(response.data);
-                    this.isGuest = response.data.isGuest;
+                    this.isAuthenticated = true;
+                    this.isGuest = false;
+                    // Clear guest cart if now authenticated
+                    localStorage.removeItem('guestCart');
                 } catch (error) {
                     if (error.response?.status === 401) {
+                        // Fall back to guest cart
                         const guestResponse = await axios.get('/cart/guest');
                         this.updateCartState(guestResponse.data);
+                        this.isAuthenticated = false;
                         this.isGuest = true;
                     } else {
                         throw error;
                     }
                 }
             } catch (error) {
-                this.error = error.response?.data?.message || 'Failed to initialize cart';
+                console.error('Cart init error:', error);
+                this.error = error.response?.data?.message || 'Failed to load cart';
+                // Maintain existing cart state if available
             } finally {
                 this.isLoading = false;
+                this.initialized = true;
             }
         },
-        
         async addToCart(productId, quantity = 1, additions = []) {
             this.isLoading = true;
             try {
@@ -58,18 +76,17 @@ export const useCartStore = defineStore('cart', {
 
         async updateQuantity(itemId, quantity, additions = []) {
             try {
-                const endpoint = this.isAuthenticated ? `/cart/${itemId}` : `/cart/guest/${itemId}`;
-                const response = await axios.put(endpoint, { 
-                    quantity,
-                    additions
-                });
-                this.updateCartState(response.data);
+              const endpoint = this.isAuthenticated ? `/api/cart/${itemId}` : `/cart/guest/${itemId}`;
+              const response = await axios.put(endpoint, { 
+                quantity,
+                additions: additions.map(a => a.id || a) // Send just IDs
+              });
+              this.updateCartState(response.data);
             } catch (error) {
-                this.error = error.response?.data?.message || 'Failed to update quantity';
-                throw error;
+              this.error = error.response?.data?.message || 'Failed to update quantity';
+              throw error;
             }
-        },
-
+          },
         async removeItem(itemId) {
             try {
                 const endpoint = this.isAuthenticated ? `/api/cart/${itemId}` : `/cart/guest/${itemId}`;
@@ -81,11 +98,23 @@ export const useCartStore = defineStore('cart', {
             }
         },
         
-        updateCartState(data) {
-            this.items = data.items;
-            this.count = data.count;
-            this.total = data.total;
-        }
+     updateCartState(data) {
+            this.items = data.items || [];
+            this.count = data.count || 0;
+            this.total = data.total || 0;
+            
+            // Persist guest cart to localStorage
+            if (this.isGuest) {
+                console.log(this.total);
+                localStorage.setItem('guestCart', JSON.stringify({
+                    items: this.items,
+                    count: this.count,
+                    total: this.total,
+                    updatedAt: Date.now()
+                }));
+            }
+        },
+
     },
     getters: {
         formattedTotal: (state) => `$${state.total.toFixed(2)}`,

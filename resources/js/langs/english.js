@@ -4,6 +4,6 @@ export default {
         categoriesmenu: "Categories Menu",
         home: "Home",
         about: "About Us",
-        // Add all your English translations here
+        // Add all your Englis`h translations here
     }
 }

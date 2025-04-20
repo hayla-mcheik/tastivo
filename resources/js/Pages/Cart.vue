@@ -58,19 +58,33 @@ const animateValue = (start, end, target) => {
 
 const updateQuantity = async (itemId, newQuantity) => {
   if (newQuantity < 1 || newQuantity > 10) return;
-  await cartStore.updateQuantity(itemId, newQuantity);
+  
+  // Find the current item to get its additions
+  const currentItem = items.value.find(item => item.id === itemId);
+  const additions = currentItem?.additions || currentItem?.product?.additions || [];
+  
+  await cartStore.updateQuantity(itemId, newQuantity, additions);
 };
-
 const removeItem = async (itemId) => {
   await cartStore.removeItem(itemId);
 };
 
 const getItemTotalWithAdditions = (item) => {
   const base = item.price * item.quantity;
-  const additions = item.product.additions?.reduce((sum, addition) => {
-    return sum + (parseFloat(addition.price) * item.quantity);
-  }, 0) || 0;
-  return base + additions;
+  
+  // Check both item.additions and item.product.additions
+  const additions = item.additions || item.product?.additions || [];
+  
+  const additionsTotal = additions.reduce((sum, addition) => {
+    // Handle both full addition objects and just IDs
+    const price = addition.price || 
+                 (typeof addition === 'number' 
+                  ? allAdditions.value.find(a => a.id === addition)?.price 
+                  : 0);
+    return sum + (parseFloat(price) * item.quantity);
+  }, 0);
+  
+  return base + additionsTotal;
 };
 
 

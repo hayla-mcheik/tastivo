@@ -89,46 +89,49 @@ const selectSuggestion = (suggestion) => {
 </script>
 
 <template>
-    <div class="fixed bottom-0 left-0 z-50 w-full h-12 bg-white border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
-        <div class="grid h-full max-w-lg grid-cols-4 mx-auto font-medium">
-            <!-- Home Button -->
-            <Link 
-                href="/"
-                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
-                :class="{ 'text-red-600 dark:text-red-600': currentRoute === '/' }"
-            >
-                <i class="fa-solid fa-house"></i>
-            </Link>
-            
-            <!-- Cart Button -->
-            <Link 
-                href="/cart"
-                class="relative inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group cart-icon"
-                :class="{ 'text-red-600 dark:text-red-600': currentRoute === '/cart' }"
-            >
-                <i class="fa-solid fa-cart-shopping text-xl group-hover:scale-110 transition-transform duration-200"></i>
-                <CartCountAnimation :count="cartCount" />
-            </Link>
-            
-            <!-- Search Button -->
-            <button 
-                @click="showSearchModal = true"
-                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
-                :class="{ 'text-red-600 dark:text-red-600': currentRoute === '/search' }"
-            >
-                <i class="fa-solid fa-magnifying-glass hover:text-gray-300"></i>
-            </button>
-            
-            <!-- Info Button -->
-            <Link 
-                href="/contact"
-                class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
-                :class="{ 'text-red-600 dark:text-red-600': currentRoute === '/contact' }"
-            >
-                <i class="fa-solid fa-circle-info"></i>
-            </Link>
-        </div>
+<div class="fixed bottom-0 left-0 z-50 w-full h-12 md:h-20 bg-white border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+    <div class="grid h-full w-full grid-cols-4 font-medium">
+        <!-- Home Button -->
+        <Link 
+            href="/"
+            class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
+            :class="{ 'text-red-600 dark:text-red-600': currentRoute === '/' }"
+        >
+            <i class="fa-solid fa-house"></i>
+        </Link>
+
+        <!-- Cart Button -->
+        <Link 
+    href="/cart"
+    class="relative inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group cart-icon"
+    :class="{ 'text-red-600 dark:text-red-600': currentRoute === '/cart' }"
+>
+    <div class="relative">
+        <i class="fa-solid fa-cart-shopping text-xl group-hover:scale-110 transition-transform duration-200"></i>
+        <CartCountAnimation :count="cartCount" />
+    </div>
+</Link>
+
+        <!-- Search Button -->
+        <button 
+            @click="showSearchModal = true"
+            class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
+            :class="{ 'text-red-600 dark:text-red-600': currentRoute === '/search' }"
+        >
+            <i class="fa-solid fa-magnifying-glass hover:text-gray-300"></i>
+        </button>
+
+        <!-- Info Button -->
+        <Link 
+            href="/contact"
+            class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group"
+            :class="{ 'text-red-600 dark:text-red-600': currentRoute === '/contact' }"
+        >
+            <i class="fa-solid fa-circle-info"></i>
+        </Link>
+    </div>
 </div>
+
    <!-- Enhanced Search Modal -->
    <div v-if="showSearchModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl transform transition-all">

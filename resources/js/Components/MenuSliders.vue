@@ -1,166 +1,67 @@
+<script setup>
+import { onMounted, onUpdated } from 'vue';
+import { initCarousels } from 'flowbite';
+defineProps({
+  categories: Array // Changed from Object to Array
+});
+// Initialize carousel when component mounts or updates
+onMounted(() => {
+  initCarousels();
+});
+
+onUpdated(() => {
+  initCarousels();
+});
+</script>
+
 <template>
-  <div class="ul-shop-container">
-    <div 
-      class="relative w-full overflow-hidden hero-slider rounded-2xl my-4"
-      @touchstart="handleTouchStart"
-      @touchmove="handleTouchMove"
-      @touchend="handleTouchEnd"
-    >
-      <!-- Carousel container -->
-      <div 
-        ref="slider"
-        class="flex transition-transform duration-300 ease-out"
-        :style="{ transform: `translateX(-${offset}px)` }"
-      >
-        <!-- Category slides -->
-        <div 
-          v-for="(category, index) in categories"
-          :key="index"
-          class="flex-shrink-0 hero-slider"
-          :style="{ width: '100%' }"
-        >
-          <div class="bg-whiteshadow-md overflow-hidden h-full ">
-            <img 
-              :src="`storage/${category.image}`" 
-              class="w-full h-[12rem] md:h-48 object-cover "
-              :alt="category.name"
-            >
-   
-          </div>
+  <div>
+    <div v-if="categories.length > 0" id="default-carousel" class="relative w-full" data-carousel="slide">
+      <!-- Carousel wrapper -->
+      <div class="relative aspect-[16/9] overflow-hidden rounded-lg">
+        <!-- Dynamic items -->
+        <div v-for="(category, index) in categories" 
+             :key="category.id" 
+             class="hidden duration-700 ease-in-out" 
+             :data-carousel-item="index === 0 ? 'active' : ''">
+          <img :src="'storage/' + category.image" 
+               class="absolute block w-full h-full object-cover -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" 
+               :alt="category.name || 'Category image'">
         </div>
       </div>
-  
-      <!-- Navigation buttons -->
-      <button 
-        v-if="showNavigation"
-        @click="prev"
-        class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 ml-2"
-        :disabled="currentIndex === 0"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
+      
+      <!-- Slider indicators -->
+      <div class="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3 rtl:space-x-reverse">
+        <button v-for="(category, index) in categories" 
+                :key="'indicator-' + category.id"
+                type="button" 
+                class="w-3 h-3 rounded-full" 
+                :aria-current="index === 0 ? 'true' : 'false'" 
+                :aria-label="'Slide ' + (index + 1)" 
+                :data-carousel-slide-to="index"></button>
+      </div>
+      
+      <!-- Slider controls -->
+      <button type="button" class="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-prev>
+        <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+          <svg class="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 1 1 5l4 4"/>
+          </svg>
+          <span class="sr-only">Previous</span>
+        </span>
       </button>
-      <button 
-        v-if="showNavigation"
-        @click="next"
-        class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 mr-2"
-        :disabled="currentIndex >= maxIndex"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
+      <button type="button" class="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-next>
+        <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
+          <svg class="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+          </svg>
+          <span class="sr-only">Next</span>
+        </span>
       </button>
     </div>
-    </div>
-  </template>
-  
-  <script setup>
-  import { ref, computed, onMounted, onUnmounted } from 'vue'
-  
-  const props = defineProps({
-    categories: {
-      type: Array,
-      required: true,
-    },
-    slidesToShow: {
-      type: Number,
-      default: 1
-    },
-    slidesToScroll: {
-      type: Number,
-      default: 1
-    }
-  })
-  
-  const slider = ref(null)
-  const currentIndex = ref(0)
-  const slideWidth = ref(0)
-  const offset = ref(0)
-  const containerWidth = ref(0)
-  const touchStartX = ref(0)
-  const touchEndX = ref(0)
-  const isDragging = ref(false)
-  const startOffset = ref(0)
-  const dragOffset = ref(0)
-  
-  const showNavigation = computed(() => props.categories.length > props.slidesToShow)
-  const maxIndex = computed(() => Math.max(0, props.categories.length - props.slidesToShow))
-  
-  const updateDimensions = () => {
-    if (slider.value) {
-      containerWidth.value = slider.value.offsetWidth
-      slideWidth.value = (containerWidth.value - 32) / props.slidesToShow // 32px for padding
-      offset.value = currentIndex.value * slideWidth.value * props.slidesToScroll
-    }
-  }
-  
-  const next = () => {
-    if (currentIndex.value < maxIndex.value) {
-      currentIndex.value = Math.min(currentIndex.value + 1, maxIndex.value)
-      offset.value = currentIndex.value * slideWidth.value * props.slidesToScroll
-    }
-  }
-  
-  const prev = () => {
-    if (currentIndex.value > 0) {
-      currentIndex.value = Math.max(currentIndex.value - 1, 0)
-      offset.value = currentIndex.value * slideWidth.value * props.slidesToScroll
-    }
-  }
-  
-  const handleTouchStart = (e) => {
-    isDragging.value = true
-    touchStartX.value = e.touches[0].clientX
-    startOffset.value = offset.value
-  }
-  
-  const handleTouchMove = (e) => {
-    if (!isDragging.value) return
-    touchEndX.value = e.touches[0].clientX
-    dragOffset.value = touchStartX.value - touchEndX.value
-    
-    // Apply the drag offset with resistance
-    offset.value = startOffset.value + dragOffset.value * 0.5
-  }
-  
-  const handleTouchEnd = () => {
-    if (!isDragging.value) return
-    isDragging.value = false
-    
-    // Determine if we should change slides based on swipe distance
-    const threshold = slideWidth.value / 3
-    const movedBy = touchStartX.value - touchEndX.value
-  
-    if (movedBy > threshold && currentIndex.value < maxIndex.value) {
-      next()
-    } else if (movedBy < -threshold && currentIndex.value > 0) {
-      prev()
-    } else {
-      // Return to original position
-      offset.value = currentIndex.value * slideWidth.value * props.slidesToScroll
-    }
-  }
-  
-  onMounted(() => {
-    updateDimensions()
-    window.addEventListener('resize', updateDimensions)
-  })
-  
-  onUnmounted(() => {
-    window.removeEventListener('resize', updateDimensions)
-  })
-  </script>
-  
-  <style scoped>
-  /* Custom transition for smooth sliding */
-  .transition-transform {
-    transition-property: transform;
-    will-change: transform;
-  }
-  
-  /* Disable text selection during drag */
-  .user-select-none {
-    user-select: none;
-  }
-  </style>
+  </div>
+</template>
+
+<style scoped>
+/* Your styles here */
+</style>

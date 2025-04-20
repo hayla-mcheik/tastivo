@@ -13,7 +13,7 @@ import french from "./langs/french";
 import { createPinia } from "pinia";
 import router from "./router";
 
-// Add this right after your imports in main.js
+
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '';
@@ -21,7 +21,7 @@ const pinia = createPinia();
 
 const i18n = createI18n({
     legacy: false,
-    locale: localStorage.getItem('locale') || "ar-AR", // Get saved locale or default to Arabic
+    locale: localStorage.getItem('locale') || "ar-AR", 
     fallbackLocale: "en-US",
     messages: {
         "en-US": english.messages,

@@ -11,13 +11,13 @@ const footer = inject('footer')
 const props = defineProps({
     category: Object,
     categories: Object,
-    products: Array, // These are now just the initial category's products
+    products: Array, 
     additions: Array,
-    allProducts: Array ,// All products for filtering
+    allProducts: Array ,
     initialCategory: Number
 });
 
-// State for category filtering
+
 const activeCategory = ref(null);
 const currentProducts = ref(props.products);
 const flyingItems = ref([]);
@@ -68,8 +68,15 @@ const openAdditionModal = (product, event) => {
 };
 
 const addToCartWithAnimation = async (productId, event) => {
-  const product = props.products.find(p => p.id === productId);
+  console.log(productId);
+  const product = filteredProducts.value.find(p => p.id === productId) || 
+                 props.products.find(p => p.id === productId);
   
+  if (!product) {
+    console.error('Product not found:', productId);
+    return;
+  }
+  console.log(product);
   // Get cart icon position (footer cart)
   const cartIcon = document.querySelector('.cart-icon');
   const cartRect = cartIcon?.getBoundingClientRect();
@@ -138,49 +145,44 @@ const filteredProducts = computed(() => {
 // Filter by category
 const filterByCategory = (categoryId) => {
   if (categoryId === props.initialCategory) {
-    // Clicking the initial category shows only its products
+
     activeCategory.value = props.initialCategory;
     currentProducts.value = props.products;
   } else {
-    // Clicking other categories filters from all products
     activeCategory.value = categoryId;
     currentProducts.value = props.allProducts;
   }
 };
 
-// Clear filter resets to initial category
 const clearFilter = () => {
   activeCategory.value = props.initialCategory;
   currentProducts.value = props.products;
 };
-// Get additions for the selected product
+
 const currentProductAdditions = computed(() => {
   if (!selectedProduct.value) return [];
   
-  // First check if product has direct additions relation
+  
   if (selectedProduct.value.additions && selectedProduct.value.additions.length > 0) {
     return selectedProduct.value.additions;
   }
-  
-  // Otherwise filter from global additions prop
+
   return props.additions?.filter(a => a.product_id === selectedProduct.value.id) || [];
 });
 
-// Calculate total price with additions
 const totalWithAdditions = computed(() => {
   if (!selectedProduct.value) return '0.00';
   
-  // Ensure base price is a number
+
   const basePrice = Number(selectedProduct.value.price) || 0;
   
   const additionsTotal = selectedAdditions.value.reduce((total, additionId) => {
     const addition = currentProductAdditions.value.find(a => a.id === additionId);
-    // Ensure addition price is a number
+
     const price = Number(addition?.price) || 0;
     return total + price;
   }, 0);
-  
-  // Format the total with 2 decimal places
+
   return (basePrice + additionsTotal).toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2

@@ -30,7 +30,7 @@ onUnmounted(() => {
 <template>
     <span 
         v-if="count > 0"
-        class="cart-count-badge"
+        class="cart-count-badge  text-xs md:text-sm"
         :class="{
             'animate-pop': isAnimating && animationType === 'add',
             'animate-pulse': !isAnimating && count > 0
@@ -44,8 +44,8 @@ onUnmounted(() => {
 <style scoped>
 .cart-count-badge {
     position: absolute;
-    top: 0;
-    right: 4px;
+    top: -8px;
+    right: -30px;
     background-color: #ef4444;
     color: white;
     font-size: 0.75rem;
@@ -58,6 +58,7 @@ onUnmounted(() => {
     justify-content: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 10;
+    line-height: 1;
 }
 
 /* Pop animation */
