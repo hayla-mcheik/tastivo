@@ -77,4 +77,9 @@ public function cart()
             return $item->price * $item->quantity;
         });
     }
+    
+    public function restaurant()
+    {
+        return $this->hasOne(Restaurant::class);
+    }
 }
