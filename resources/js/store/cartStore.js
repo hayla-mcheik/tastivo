@@ -97,7 +97,18 @@ export const useCartStore = defineStore('cart', {
                 throw error;
             }
         },
-        
+
+        async clearCart() {
+            try {
+                const endpoint = this.isAuthenticated ? '/api/cart/clear' : '/cart/guest/clear';
+                const response = await axios.delete(endpoint);
+                this.updateCartState(response.data);
+            } catch (error) {
+                this.error = error.response?.data?.message || 'Failed to remove item';
+                throw error;
+            }
+        },
+ 
      updateCartState(data) {
             this.items = data.items || [];
             this.count = data.count || 0;

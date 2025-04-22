@@ -56,7 +56,11 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Cart::class);
     }
-
+// In User.php model
+public function cart()
+{
+    return $this->hasMany(Cart::class);
+}
     public function isAdmin()
     {
         return $this->role === 'admin';

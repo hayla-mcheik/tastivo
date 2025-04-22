@@ -14,7 +14,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 });
 Route::get('/additions', [CartController::class, 'additions']);
-
+Route::delete('cart/guest/clear', [CartController::class, 'guestClearCart']);
 // Guest cart routes (using session)
 // Route::prefix('cart')->group(function () {
 //     Route::get('/guest', [CartController::class, 'guestIndex']);

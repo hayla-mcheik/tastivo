@@ -50,9 +50,17 @@ Route::prefix('cart')->group(function () {
     Route::post('/guest', [CartController::class, 'guestAddToCart']);
     Route::delete('/guest/{cartItem}', [CartController::class, 'guestRemoveFromCart']);
     Route::put('/guest/{cartItem}', [CartController::class, 'guestUpdateQuantity']);
-    Route::delete('/guest/clear', [CartController::class, 'guestClearCart']);
+    // Route::delete('/guest/clear', [CartController::class, 'guestClearCart']);
 });
 
+
+// Authenticated routes
+Route::middleware('auth')->group(function () {
+    Route::delete('cart/clear', [CartController::class, 'clear']);
+});
+
+// Guest routes
+Route::delete('cart/guest/clear', [CartController::class, 'guestClearCart']);
 //Admin Routes
 
 Route::middleware(['auth','verified', Admin::class])->prefix('admin')

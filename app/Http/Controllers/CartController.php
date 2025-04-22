@@ -199,29 +199,49 @@ class CartController extends Controller
 // In CartController.php
 
 
-public function guestClearCart(Request $request)
+// For authenticated users
+public function clear(Request $request)
 {
-    try {
-        $sessionId = $request->session()->getId();
-        $deleted = Cart::where('session_id', $sessionId)->delete();
+    if (!$request->user()) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
 
-        return response()->json([
-            'success' => true,
-            'message' => $deleted > 0 
-                ? 'Cart cleared successfully!' 
-                : 'Your cart was already empty',
+    $deleted = $request->user()->cart()->delete();
+
+    return response()->json([
+        'success' => (bool)$deleted,
+        'message' => $deleted ? 'Cart cleared' : 'Cart was empty',
+        'data' => [
             'items' => [],
             'count' => 0,
-            'total' => 0
-        ]);
-        
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to clear cart',
-            'error' => $e->getMessage()
-        ], 500);
+            'total' => 0,
+            'isGuest' => false
+        ]
+    ]);
+}
+
+// For guest users
+public function guestClearCart(Request $request)
+{
+    $sessionId = $request->session()->getId();
+    
+    if (empty($sessionId)) {
+        $request->session()->regenerate();
+        $sessionId = $request->session()->getId();
     }
+
+    $deleted = Cart::where('session_id', $sessionId)->delete();
+
+    return response()->json([
+        'success' => (bool)$deleted,
+        'message' => $deleted ? 'Guest cart cleared' : 'Guest cart was empty',
+        'data' => [
+            'items' => [],
+            'count' => 0,
+            'total' => 0,
+            'isGuest' => true
+        ]
+    ]);
 }
 public function guestUpdateQuantity(Request $request, Cart $cartItem)
 {
