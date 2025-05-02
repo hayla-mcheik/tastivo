@@ -18,7 +18,7 @@ axios.defaults.withCredentials = true;
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '';
 const pinia = createPinia();
-
+localStorage.removeItem('locale');
 const getInitialLocale = () => {
     const storedLocale = localStorage.getItem('locale');
     return storedLocale || 'en-US'; // Default to English if no stored preference
