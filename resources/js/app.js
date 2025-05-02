@@ -21,7 +21,7 @@ const pinia = createPinia();
 
 const i18n = createI18n({
     legacy: false,
-    locale: "en-US", 
+    locale: localStorage.getItem('locale') || "en-US", 
     fallbackLocale: "en-US",
     messages: {
         "en-US": english.messages,
