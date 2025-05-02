@@ -20,15 +20,13 @@ axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '';
 const pinia = createPinia();
 const getInitialLocale = () => {
     const storedLocale = localStorage.getItem('locale');
-    return storedLocale || 'en-US'; // Default to English if no stored preference
-  };
-  
-  onMounted(() => {
-    if (!localStorage.getItem('locale')) {
-      locale.value = 'en-US';
-      localStorage.setItem('locale', 'en-US');
+    if (!storedLocale) {
+        localStorage.setItem('locale', 'en-US');
+        return 'en-US';
     }
-  });
+    return storedLocale;
+};
+
 const i18n = createI18n({
     legacy: false,
     locale: getInitialLocale(),
