@@ -11,20 +11,22 @@ class CategoryController extends Controller
 {
     public function index(Request $request)
     {
-$categories = Category::all();
-        return Inertia::render('Admin/Category/Index',[
+        $categories = Category::all();
+        return Inertia::render('Admin/Category/Index', [
             'categories' => $categories,
         ]);
     }
+
     public function create()
     {
         return Inertia::render('Admin/Category/Create');  
     }
+
     public function store(Request $request)
     {
         $fields = $request->validate([
             'name' => ['required', 'max:255'],
-           'slug' => 'required',
+            'slug' => 'required',
             'image' => ['nullable', 'file', 'max:3072', 'mimes:jpeg,jpg,png,webp'],
             'status' => 'nullable|boolean'
         ]);
@@ -32,21 +34,22 @@ $categories = Category::all();
         $fields['status'] = $fields['status'] ?? 0;
     
         if ($request->hasFile('image')) {
-            $fields['image'] = $request->file('image')->store('images/categories', 'public'); // Fixed
+            $fields['image'] = $request->file('image')->store('images/categories', 'public');
         }
     
         Category::create($fields);
     
-        return redirect()->route('categories.index')->with('status', 'Category created successfully.');
+        return redirect()->route('categories.index')->with('success', 'Category created successfully.');
     }
     
     public function edit($id)
     {
-        $categories = Category::find($id);
-        return Inertia::render('Admin/Category/Edit',[
-            'categories' => $categories
+        $category = Category::findOrFail($id);
+        return Inertia::render('Admin/Category/Edit', [
+            'category' => $category
         ]);  
     }
+
     public function update(Request $request, $id)
     {
         $category = Category::findOrFail($id);
@@ -60,6 +63,7 @@ $categories = Category::all();
     
         $fields['status'] = $fields['status'] ?? 0;
     
+        // Handle image update
         if ($request->hasFile('image')) {
             // Delete old image if exists
             if ($category->image && Storage::disk('public')->exists($category->image)) {
@@ -67,13 +71,15 @@ $categories = Category::all();
             }
             // Store new image
             $fields['image'] = $request->file('image')->store('images/categories', 'public');
+        } else {
+            // Keep the existing image if no new image is uploaded
+            unset($fields['image']); // Remove image from fields if not updated
         }
     
-        $category->update($fields); // Update the category
+        $category->update($fields);
     
-        return redirect()->route('categories.index')->with('status', 'Category updated successfully.');
+        return redirect()->route('categories.index')->with('success', 'Category updated successfully.');
     }
-    
     public function destroy($id)
     {
         $category = Category::findOrFail($id);
@@ -85,6 +91,6 @@ $categories = Category::all();
     
         $category->delete();
     
-        return redirect()->route('categories.index')->with('status', 'Category deleted successfully.');
+        return redirect()->route('categories.index')->with('success', 'Category deleted successfully.');
     }
 }
