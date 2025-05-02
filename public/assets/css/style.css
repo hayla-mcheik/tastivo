@@ -5318,7 +5318,7 @@ button {
   --tw-gradient-from: #9d0606 var(--tw-gradient-from-position);
 }
 .ul-food-image{
-  height: 106px;
+  height: 100px;
   width: 100%;
   border-radius: 0px;
   background-color: #f2f2f2;
@@ -5332,7 +5332,7 @@ button {
 } 
 
 .logo-container img{
-height: 50px;
+height: 56px;
 }
 .hero-slider::before {
   position: absolute;
@@ -5341,7 +5341,7 @@ height: 50px;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color:#0000000a ;
+  /* background-color:#0000000a ; */
 }
 .ul-food-image::before{
   position: absolute;
@@ -5354,4 +5354,7 @@ height: 50px;
 }
 .ul-banner{
   display: none;
+}
+#default-carousel .buttonsquare{
+background-color: #cccccccc;
 }

@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminProfile;
+use App\Http\Controllers\AdminProfileController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CheckoutController;
@@ -12,6 +14,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SettingController;
 use App\Http\Middleware\Admin;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -86,5 +89,12 @@ Route::middleware(['auth','verified', Admin::class])->prefix('admin')
         'update' => 'admin.contact.update',
         'destroy' => 'admin.contact.destroy',
     ]);
+});
+Route::middleware(['auth','verified', Admin::class])->prefix('admin')->group (function () 
+{
+    Route::get('profile', [AdminProfileController::class, 'index'])->name('admin.profile');
+    Route::put('profile', [AdminProfileController::class, 'update'])->name('admin.profile.update');
+    Route::get('settings', [SettingController::class, 'index'])->name('admin.settings');
+    Route::post('settings', [SettingController::class, 'update'])->name('admin.settings.update');
 });
 require __DIR__ . '/auth.php';

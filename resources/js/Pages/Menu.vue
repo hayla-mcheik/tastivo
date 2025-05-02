@@ -6,7 +6,9 @@ import 'vue3-toastify/dist/index.css';
 import { inject } from 'vue'
 import { useCartStore } from '../store/cartStore';
 import FlyingItem from '../Components/FlyingItem.vue';
-
+import VerticalCategories from '../Components/VerticalCategories.vue';
+import CartSummary from '../Components/CartSummary.vue';
+import FooterDesktop from '../Components/FooterDesktop.vue';
 const footer = inject('footer') 
 const props = defineProps({
     category: Object,
@@ -32,6 +34,11 @@ const modalImageUrl = ref('');
 
 const fullStars = Math.floor(props.rating);
 const halfStar = props.rating % 1 >= 0.5 ? fullStars + 1 : 0;
+
+const isEmptyCategory = computed(() => {
+  return activeCategory.value && filteredProducts.value.length === 0;
+});
+
 
 const openImageModal = (product) => {
   modalImageUrl.value = '/storage/' + product.image;
@@ -145,13 +152,15 @@ const filteredProducts = computed(() => {
 // Filter by category
 const filterByCategory = (categoryId) => {
   if (categoryId === props.initialCategory) {
-
     activeCategory.value = props.initialCategory;
     currentProducts.value = props.products;
   } else {
     activeCategory.value = categoryId;
     currentProducts.value = props.allProducts;
   }
+  
+  // Scroll to top when changing categories
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 const clearFilter = () => {
@@ -203,6 +212,7 @@ const formatPrice = (price) => {
 
 
 <template>
+  <div class="md:hidden">
     <!-- Animated Category Pills -->
     <div class="sticky top-0 z-20 bg-gradient-to-r from-white to-gray-50 shadow-sm backdrop-blur-sm">
         <div class="container mx-auto">
@@ -235,6 +245,7 @@ const formatPrice = (price) => {
             </div>
         </div>
     </div>
+</div>
 
     <!-- Creative Product Grid with Smaller Images -->
     <section class="container mx-auto py-8 md:py-12 mb-5">
@@ -257,7 +268,106 @@ const formatPrice = (price) => {
         </svg>
     </button>
 </div>
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+
+<div class="hidden md:flex container mx-auto gap-6 mt-6 w-full">
+  <div class="w-[18%]">
+      <VerticalCategories :categories="categories" />
+    </div>
+    <div class="w-[62%]">
+      <div v-if="isEmptyCategory" class="text-center py-12 px-4">
+    <div class="max-w-md mx-auto">
+      <div class="text-gray-400 mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+      </div>
+      <h3 class="text-xl font-bold text-gray-800 mb-2">
+        No items in this category yet
+      </h3>
+      <p class="text-gray-600 mb-6">
+        We couldn't find any products in the 
+        <span class="font-semibold">{{ categories.find(c => c.id === activeCategory)?.name }}</span> 
+        category. Please check back later or browse other categories.
+      </p>
+    </div>
+  </div>
+<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-6 xl:grid-cols-2 2xl:grid-cols-2">
+            <!-- Product Card with Smaller Image -->
+            <div v-for="product in filteredProducts" :key="product.id" 
+                 class="group relative overflow-hidden  bg-white transition-all duration-500
+                        hover:-translate-y-1 hover:shadow-xl border border-gray-100 hover:border-primary-100">
+                
+                <!-- Smaller Product Image Container -->
+                <div class="relative h-[14rem] overflow-hidden cursor-pointer product-image " @click="openImageModal(product)">
+                    <img :src="'/storage/' + product.image" 
+                         :alt="product.name"
+                         class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    
+                         <div v-if="cartItemQuantities && product.id in cartItemQuantities" 
+     class="absolute bottom-2 right-2 bg-red-600 text-white text-xs font-bold 
+        rounded-full    h-10 w-10 flex items-center justify-center animate-bounce">
+  {{ cartItemQuantities[product.id] }}
+</div>
+
+                    <!-- Floating Add to Cart -->
+                    <button @click="openAdditionModal(product, $event)"
+                            class="absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center 
+                                bg-white/90 backdrop-blur-md  shadow-lg text-primary-600 transition-all 
+                                duration-300 opacity-0 group-hover:opacity-100 hover:bg-primary-600 hover:text-white
+                                transform translate-y-2 group-hover:translate-y-0">
+                        <i class="text-red-600 fa-solid fa-cart-plus text-base"></i>
+                    </button>
+                </div>
+
+
+                <!-- Product Info -->
+                <div class="p-4 pt-3">
+                    <div class="flex justify-between items-start mb-1">
+                        <h3 class="text-capitalize text-lg font-bold text-gray-800 line-clamp-1 pr-2">
+                            {{ product.name }}
+                        </h3>
+                        <span class="text-sm font-bold text-red-600 
+                                    px-2 py-1 rounded-full whitespace-nowrap">
+                            ${{ product.price }}
+                        </span>
+                    </div>
+                    
+                    <p class="text-sm text-gray-500 line-clamp-2 mb-3">
+                        {{ product.desc }}
+                    </p>
+                    
+                    <!-- Rating and Cart -->
+                    <div class="flex items-center justify-between text-xs">
+                        <div class="flex items-center space-x-1 text-black">
+    <i class="fa-solid fa-star text-yellow-400"></i>
+    <span>{{ product.rate.toFixed(1) }}</span>
+    <span>({{ product.review_count || 0 }})</span>
+</div>
+                        <button 
+                            @click="openAdditionModal(product, $event)"
+                        >
+                            <i class="text-black fa-solid fa-cart-plus text-base"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Creative Corner Element -->
+                <div class="absolute top-0 left-0 w-16 h-16 overflow-hidden">
+                    <div class="absolute -left-8 -top-8 w-16 h-16 rotate-45 bg-primary-600/10 
+                                group-hover:bg-primary-600/20 transition-all duration-500"></div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="w-[20%]">
+
+<CartSummary />
+          
+        </div>
+</div>
+
+<div class="md:hidden">
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-6 xl:grid-cols-2 2xl:grid-cols-2">
             <!-- Product Card with Smaller Image -->
             <div v-for="product in filteredProducts" :key="product.id" 
                  class="group relative overflow-hidden rounded-2xl bg-white transition-all duration-500
@@ -324,6 +434,9 @@ const formatPrice = (price) => {
                 </div>
             </div>
         </div>
+</div>
+
+
 
         <transition name="fade">
   <div v-if="showImageModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 p-4">
@@ -445,6 +558,9 @@ const formatPrice = (price) => {
             />
         </div>
     </section>
+    <div class="hidden md:flex">
+        <FooterDesktop />
+    </div>
 </template>
 
 <style scoped>

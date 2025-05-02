@@ -3,6 +3,7 @@
 import Menusliders from '../Components/menusliders.vue';
 import PopularProducts from '../Components/PopularProducts.vue';
 import DesktopLayout from '../Components/DesktopLayout.vue';
+import FooterDesktop from '../Components/FooterDesktop.vue';
 
 defineProps({
   sliders: Object,
@@ -31,4 +32,8 @@ defineProps({
   />
   </div>
   </div>
+  <div class="hidden md:flex">
+        <FooterDesktop />
+    </div>
+
 </template>

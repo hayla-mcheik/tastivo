@@ -27,18 +27,17 @@ const translatedName = (category) => {
 
     <section class="ul-foods-shop ul-section-spacing relative mb-5 pb-2">
         <div class="ul-shop-container">
-            <div class="text-center mb-4 relative">
-                <!-- Floating decorative elements -->
-                <!-- Main title with layered effect -->
+            <!-- <div class="text-center mb-4 relative">
+       
                 <h2 class="text-2xl sm:text-6xl font-bold italic relative z-10">
-                    <span class="absolute -z-10 -inset-2 bg-gradient-to-r from-[#fddfdf] to-transparent opacity-60 rounded-full blur-sm"></span>
+                    <span class="absolute -z-10 -inset-2 bg-gradient-to-r from-[#fddfdf] to-transparent opacity-60  blur-sm"></span>
                     <span class="relative bg-clip-text text-black">
                        
                         {{ t('categoriesmenu') }}
                     </span>
                 </h2>
 
-                <!-- Decorative divider -->
+        
                 <div class="flex justify-center items-center">
                     <span class="block w-16 h-0.5 bg-red-600"></span>
                     <span class="mx-4 text-red-600 text-xl">
@@ -46,12 +45,12 @@ const translatedName = (category) => {
                     </span>
                     <span class="block w-16 h-0.5 bg-red-600"></span>
                 </div>
-            </div>
+            </div> -->
             
             <div class="row ul-bs-row row-cols-lg-4 row-cols-md-3 row-cols-2 row-cols-xxs-2">
             <div v-for="category in categories" :key="category.id" class="col">
-                <div class="ul-food p-0 m-0 rounded-2xl">
-                    <div class="ul-food-image w-full rounded-t-2xl" >
+                <div class="ul-food p-0 m-0 ">
+                    <div class="ul-food-image w-full " >
                         <Link :href="`/categories/${category.slug}`" class="block">
                             <img class="w-full" :src="'/storage/' + category.image" 
                                  :alt="translatedName(category) + ' Image'">
@@ -69,6 +68,7 @@ const translatedName = (category) => {
 
 
         </div>
+
     </section>
 
 </template>

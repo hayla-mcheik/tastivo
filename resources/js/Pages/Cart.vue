@@ -65,6 +65,7 @@ const updateQuantity = async (itemId, newQuantity) => {
   
   await cartStore.updateQuantity(itemId, newQuantity, additions);
 };
+
 const removeItem = async (itemId) => {
   await cartStore.removeItem(itemId);
 };
@@ -257,7 +258,6 @@ const getFullAdditions = (item) => {
 
 <style scoped>
 .cart-container {
-  max-width: 600px;
   margin: 0 auto;
   padding: 20px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

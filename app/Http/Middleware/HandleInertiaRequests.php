@@ -30,8 +30,12 @@ class HandleInertiaRequests extends Middleware
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => fn () => $request->user()
-                    ? $request->user()->only('id', 'name', 'role')
+                    ? $request->user()->only('id', 'name','email', 'role')
                     : null,
+            ],
+            'settings' => [
+                'site_logo' => \App\Models\Setting::get('site_logo'),
+                'site_name' => \App\Models\Setting::get('site_name', config('app.name')),
             ],
         ]);
     }
