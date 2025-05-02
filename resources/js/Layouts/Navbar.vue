@@ -2,7 +2,7 @@
 import { switchTheme } from "../Pages/theme";
 import NavLink from "../Components/NavLink.vue";
 import { useI18n } from 'vue-i18n';
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { usePage, Link, router } from '@inertiajs/vue3'
 import { useCartStore } from '../store/cartStore';
 import { storeToRefs } from 'pinia';
