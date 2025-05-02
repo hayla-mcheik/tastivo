@@ -16,7 +16,7 @@ export default defineConfig({
         // }
     },
     server : {
-        host: '192.168.1.13', // 👈 allows access from other devices
+        host: '192.168.1.4', // 👈 allows access from other devices
         proxy : {
             '/api' : {
                 target : "http://127.0.0.1:8000/",
