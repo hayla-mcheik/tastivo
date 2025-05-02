@@ -30,6 +30,7 @@ class HandleInertiaRequests extends Middleware
         
         return array_merge(parent::share($request), [
             'locale' => 'en',
+            'localeDirection' => 'ltr',
             'auth' => [
                 'user' => fn () => $request->user()
                     ? $request->user()->only('id', 'name','email', 'role')
