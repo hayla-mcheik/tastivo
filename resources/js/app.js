@@ -18,18 +18,18 @@ axios.defaults.withCredentials = true;
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '';
 const pinia = createPinia();
-const getInitialLocale = () => {
-    const storedLocale = localStorage.getItem('locale');
-    if (!storedLocale) {
+const defaultLocale = (() => {
+    const stored = localStorage.getItem('locale');
+    if (!stored) {
         localStorage.setItem('locale', 'en-US');
         return 'en-US';
     }
-    return storedLocale;
-};
-
+    return stored;
+})();
+localStorage.setItem('locale', 'en-US');
 const i18n = createI18n({
     legacy: false,
-    locale: getInitialLocale(),
+    locale: defaultLocale,
     fallbackLocale: "en-US",
     messages: {
         "en-US": english.messages,
