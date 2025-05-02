@@ -75,21 +75,50 @@ const openAdditionModal = (product, event) => {
 };
 
 const addToCartWithAnimation = async (productId, event) => {
-  console.log(productId);
   const product = filteredProducts.value.find(p => p.id === productId) || 
-                 props.products.find(p => p.id === productId);
+               props.products.find(p => p.id === productId);
   
-  if (!product) {
-    console.error('Product not found:', productId);
+  if (!product) return;
+
+  // More reliable mobile detection
+  const isMobile = window.innerWidth < 768 || 
+                 /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+  // Get the correct cart icon with multiple fallbacks
+  const getCartIcon = () => {
+    if (isMobile) {
+      // Try multiple selectors for mobile footer cart
+      return document.querySelector('footer .cart-icon, .mobile-cart, .footer-cart');
+    } else {
+      // Try multiple selectors for desktop navbar cart
+      return document.querySelector('header .cart-icon, .navbar-cart-icon, .desktop-cart');
+    }
+  };
+
+  // Wait for cart icon to be available (important for mobile)
+  let cartIcon = null;
+  let attempts = 0;
+  const maxAttempts = 10;
+  const delay = 100; // ms
+
+  while (!cartIcon && attempts < maxAttempts) {
+    cartIcon = getCartIcon();
+    if (!cartIcon) {
+      await new Promise(resolve => setTimeout(resolve, delay));
+      attempts++;
+    }
+  }
+
+  if (!cartIcon) {
+    console.warn('Cart icon not found after', maxAttempts * delay, 'ms');
+    await addToCart(productId);
     return;
   }
-  console.log(product);
-  // Get cart icon position (footer cart)
-  const cartIcon = document.querySelector('.cart-icon');
-  const cartRect = cartIcon?.getBoundingClientRect();
+
+  const cartRect = cartIcon.getBoundingClientRect();
   
   // Create flying item
-  if (event && cartRect) {
+  if (event) {
     flyingItems.value.push({
       id: Date.now(),
       image: '/storage/' + product.image,
@@ -99,7 +128,6 @@ const addToCartWithAnimation = async (productId, event) => {
       endY: cartRect.top + cartRect.height / 2
     });
     
-    // Remove after animation completes
     setTimeout(() => {
       flyingItems.value.shift();
     }, 1000);
@@ -107,7 +135,6 @@ const addToCartWithAnimation = async (productId, event) => {
   
   await addToCart(productId);
 };
-
 const cartStore = useCartStore();
 onMounted(() => {
     if (props.category?.id) {

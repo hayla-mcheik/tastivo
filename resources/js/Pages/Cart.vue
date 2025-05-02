@@ -144,7 +144,7 @@ const getFullAdditions = (item) => {
     <div v-else>
       <div class="cart-header">
         <h1>Your Order</h1>
-        <button @click="clearCart" class="clear-cart-btn">Clear Cart</button>
+        <!-- <button @click="clearCart" class="clear-cart-btn">Clear Cart</button> -->
       </div>
 
       <!-- Cart Items -->

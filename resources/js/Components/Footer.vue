@@ -89,7 +89,7 @@ const selectSuggestion = (suggestion) => {
 </script>
 
 <template>
-<div class="fixed bottom-0 left-0 z-50 w-full h-12 md:h-20 bg-white border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+<div class="footer fixed bottom-0 left-0 z-50 w-full h-12 md:h-20 bg-white border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
     <div class="grid h-full w-full grid-cols-4 font-medium">
         <!-- Home Button -->
         <Link 
@@ -103,7 +103,7 @@ const selectSuggestion = (suggestion) => {
         <!-- Cart Button -->
         <Link 
     href="/cart"
-    class="relative inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group cart-icon"
+    class="cart-icon mobile-cart footer-cart relative inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group "
     :class="{ 'text-red-600 dark:text-red-600': currentRoute === '/cart' }"
 >
     <div class="relative">

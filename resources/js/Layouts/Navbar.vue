@@ -171,7 +171,7 @@ const selectSuggestion = (suggestion) => {
                         <!-- Cart Button -->
                         <Link 
                             href="/cart"
-                            class="relative text-white inline-flex items-center justify-center p-2 hover:bg-gray-100 rounded-full group cart-icon"
+                            class="relative text-white inline-flex items-center justify-center p-2 hover:bg-gray-100 rounded-full group navbar-cart-icon"
                             :class="{ 'text-red-600': currentRoute === '/cart' }"
                         >
                             <div class="relative">
