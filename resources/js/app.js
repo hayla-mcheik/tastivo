@@ -19,9 +19,15 @@ axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '';
 const pinia = createPinia();
 
+const getInitialLocale = () => {
+    const storedLocale = localStorage.getItem('locale');
+    return storedLocale || 'en-US'; // Default to English if no stored preference
+  };
+  
+
 const i18n = createI18n({
     legacy: false,
-    locale: localStorage.getItem('locale') || "en-US", 
+    locale: getInitialLocale(),
     fallbackLocale: "en-US",
     messages: {
         "en-US": english.messages,

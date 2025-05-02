@@ -40,7 +40,12 @@ const changeLanguage = (langCode) => {
         document.documentElement.dir = 'ltr';
     }
 };
-
+onMounted(() => {
+  if (!localStorage.getItem('locale')) {
+    locale.value = 'en-US';
+    localStorage.setItem('locale', 'en-US');
+  }
+});
 // Initialize on component mount
 const initializeLanguage = () => {
     const savedLocale = localStorage.getItem('locale') || 'en-US';
