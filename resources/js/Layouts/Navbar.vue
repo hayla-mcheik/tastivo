@@ -43,7 +43,7 @@ const changeLanguage = (langCode) => {
 
 // Initialize on component mount
 const initializeLanguage = () => {
-    const savedLocale = localStorage.getItem('locale') || 'ar-AR';
+    const savedLocale = localStorage.getItem('locale') || 'en-US';
     locale.value = savedLocale;
     document.documentElement.lang = savedLocale;
     
