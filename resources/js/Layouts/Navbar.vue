@@ -198,33 +198,35 @@ const selectSuggestion = (suggestion) => {
         </div>
 
 
-
         <div class="header-bottom-bg-wrapper bg-dark md:hidden">
-            <div class="ul-header-bottom">
-                <div class="ul-header-bottom-wrapper ul-header-container">
-              
-                    <div class="logo-container">
-                        <Link href="/" class="block">
-                            <img src="/public/assets/img/logo.png" class="" />
-                        </Link>
-                    </div>
-                    
-                    <div class="">
-                        <div class="ul-header-socials">
-                            <div class="links">
-                                <a class="text-white" href="#"><i class="fab fa-whatsapp fa-2x"></i></a>
-                                <a class="text-white" href="#"><i class="fab fa-instagram fa-2x"></i></a>
-                                <a class="text-white" href="#"><i class="fab fa-facebook-f fa-2x"></i></a>
-                            </div>
-                        </div>
-                    </div>
+    <div class="ul-header-bottom">
+        <div class="ul-header-bottom-wrapper ul-header-container">
+            <!-- Back Button (only shown when not on home page) -->
+            <div v-if="$page.url !== '/'" class="flex items-center mr-2">
+    <button @click="$router.back()" class="text-white text-2xl">
+        <i class="fa-solid fa-angle-left"></i>
+    </button>
+</div>
 
-          
-                    
-                
+            
+            <div class="logo-container">
+                <Link href="/" class="block">
+                    <img src="/public/assets/img/logo.png" class="" />
+                </Link>
+            </div>
+            
+            <div class="">
+                <div class="ul-header-socials">
+                    <div class="links">
+                        <a class="text-white" href="#"><i class="fab fa-whatsapp fa-2x"></i></a>
+                        <a class="text-white" href="#"><i class="fab fa-instagram fa-2x"></i></a>
+                        <a class="text-white" href="#"><i class="fab fa-facebook-f fa-2x"></i></a>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
         <!-- Enhanced Search Modal -->
         <div v-if="showSearchModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
             <div class="bg-white rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl transform transition-all">
@@ -339,6 +341,21 @@ const selectSuggestion = (suggestion) => {
 </template>
 
 <style scoped>
+/* Add smooth transition for the back button */
+.back-button {
+    transition: transform 0.2s ease;
+}
+
+.back-button:hover {
+    transform: translateX(-2px);
+}
+
+/* Ensure proper spacing */
+.ul-header-bottom-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
 .ul-header {
     position: relative;
     z-index: 50;

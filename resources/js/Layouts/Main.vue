@@ -108,7 +108,7 @@ const show = ref(false);
   <Navbar />
     <!-- HEADER SECTION END -->
 
-    <main class="mt-20">
+    <main class="mt-[4.5rem]">
         <slot />
     </main>
     <div class="flex md:hidden">

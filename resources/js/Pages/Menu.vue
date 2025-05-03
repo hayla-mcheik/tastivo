@@ -73,69 +73,63 @@ const openAdditionModal = (product, event) => {
     addToCartWithAnimation(product.id, event);
   }
 };
-
 const addToCartWithAnimation = async (productId, event) => {
   const product = filteredProducts.value.find(p => p.id === productId) || 
                props.products.find(p => p.id === productId);
   
   if (!product) return;
 
-  // More reliable mobile detection
+  // Check if we're on mobile
   const isMobile = window.innerWidth < 768 || 
                  /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-  // Get the correct cart icon with multiple fallbacks
-  const getCartIcon = () => {
-    if (isMobile) {
-      // Try multiple selectors for mobile footer cart
+  // Only animate on mobile
+  if (isMobile) {
+    // Get the footer cart icon with multiple selector options
+    const getCartIcon = () => {
       return document.querySelector('footer .cart-icon, .mobile-cart, .footer-cart');
-    } else {
-      // Try multiple selectors for desktop navbar cart
-      return document.querySelector('header .cart-icon, .navbar-cart-icon, .desktop-cart');
+    };
+
+    // Wait for cart icon to be available
+    let cartIcon = null;
+    let attempts = 0;
+    const maxAttempts = 10;
+    const delay = 100; // ms
+
+    while (!cartIcon && attempts < maxAttempts) {
+      cartIcon = getCartIcon();
+      if (!cartIcon) {
+        await new Promise(resolve => setTimeout(resolve, delay));
+        attempts++;
+      }
     }
-  };
 
-  // Wait for cart icon to be available (important for mobile)
-  let cartIcon = null;
-  let attempts = 0;
-  const maxAttempts = 10;
-  const delay = 100; // ms
-
-  while (!cartIcon && attempts < maxAttempts) {
-    cartIcon = getCartIcon();
-    if (!cartIcon) {
-      await new Promise(resolve => setTimeout(resolve, delay));
-      attempts++;
+    if (cartIcon && event) {
+      const cartRect = cartIcon.getBoundingClientRect();
+      
+      // Create flying item animation to footer cart
+      flyingItems.value.push({
+        id: Date.now(),
+        image: '/storage/' + product.image,
+        startX: event.clientX,
+        startY: event.clientY,
+        endX: cartRect.left + cartRect.width / 2,
+        endY: cartRect.top + cartRect.height / 2
+      });
+      
+      setTimeout(() => {
+        flyingItems.value.shift();
+      }, 1000);
     }
   }
 
-  if (!cartIcon) {
-    console.warn('Cart icon not found after', maxAttempts * delay, 'ms');
-    await addToCart(productId);
-    return;
-  }
-
-  const cartRect = cartIcon.getBoundingClientRect();
-  
-  // Create flying item
-  if (event) {
-    flyingItems.value.push({
-      id: Date.now(),
-      image: '/storage/' + product.image,
-      startX: event.clientX,
-      startY: event.clientY,
-      endX: cartRect.left + cartRect.width / 2,
-      endY: cartRect.top + cartRect.height / 2
-    });
-    
-    setTimeout(() => {
-      flyingItems.value.shift();
-    }, 1000);
-  }
-  
+  // Always add to cart, regardless of animation
   await addToCart(productId);
 };
+
 const cartStore = useCartStore();
+
+
 onMounted(() => {
     if (props.category?.id) {
     activeCategory.value = props.category.id;
@@ -244,12 +238,12 @@ const formatPrice = (price) => {
     <div class="sticky top-0 z-20 bg-gradient-to-r from-white to-gray-50 shadow-sm backdrop-blur-sm">
         <div class="container mx-auto">
             <div class="relative">
-                <div class="absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-white to-transparent z-10"></div>
+           
                 <ul class="flex space-x-3 overflow-x-auto py-2 hide-scrollbar pl-1">
                     <li v-for="(cat, index) in categories" :key="cat.id" class="flex-shrink-0">
                         <button 
                             @click="filterByCategory(cat.id)"
-                            class="px-4 py-1 text-capitalize text-sm font-bold transition-all duration-300                     
+                            class="pr-3 py-1 text-capitalize text-sm font-bold transition-all duration-300                     
                                    text-black hover:text-primary-600 flex items-center gap-2"
                             :class="{
                                 'text-primary-600 border-b-2 border-primary-600': activeCategory === cat.id
@@ -258,24 +252,19 @@ const formatPrice = (price) => {
                                 animation: `fadeIn 0.3s ease-out ${index * 0.05}s forwards`,
                                 opacity: 0
                             }">
-                            <span class="w-2 h-2 rounded-full" 
-                                  :class="{
-                                      'bg-green-400': index % 3 === 0,
-                                      'bg-red-400': index % 3 === 1,
-                                      'bg-rose-400': index % 3 === 2
-                                  }"></span>
+                        
                             {{ cat.name }}
                         </button>
                     </li>
                 </ul>
-                <div class="absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-white to-transparent z-10"></div>
+
             </div>
         </div>
     </div>
 </div>
 
     <!-- Creative Product Grid with Smaller Images -->
-    <section class="container mx-auto py-8 md:py-12 mb-5">
+    <section class="section-padding-menu container mx-auto py-8 md:py-12 mb-5">
         <!-- Active category indicator and clear filter -->
 <!-- Active category indicator and clear filter -->
 <div v-if="activeCategory && props.category?.id && activeCategory !== props.category.id" class="flex items-center justify-between mb-4 px-2">
@@ -397,11 +386,11 @@ const formatPrice = (price) => {
   <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-6 xl:grid-cols-2 2xl:grid-cols-2">
             <!-- Product Card with Smaller Image -->
             <div v-for="product in filteredProducts" :key="product.id" 
-                 class="group relative overflow-hidden rounded-2xl bg-white transition-all duration-500
-                        hover:-translate-y-1 hover:shadow-xl border border-gray-100 hover:border-primary-100">
+                 class="group relative overflow-hidden  bg-white transition-all duration-500
+                        hover:-translate-y-1 hover:shadow-xl  hover:border-primary-100">
                 
                 <!-- Smaller Product Image Container -->
-                <div class="relative h-40 overflow-hidden cursor-pointer product-image " @click="openImageModal(product)">
+                <div class="relative h-[14rem] overflow-hidden cursor-pointer product-image " @click="openImageModal(product)">
                     <img :src="'/storage/' + product.image" 
                          :alt="product.name"
                          class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110">
@@ -424,7 +413,7 @@ const formatPrice = (price) => {
 
 
                 <!-- Product Info -->
-                <div class="p-4 pt-3">
+                <div class="p-2 pt-2">
                     <div class="flex justify-between items-start mb-1">
                         <h3 class="text-capitalize text-lg font-bold text-gray-800 line-clamp-1 pr-2">
                             {{ product.name }}
@@ -435,7 +424,7 @@ const formatPrice = (price) => {
                         </span>
                     </div>
                     
-                    <p class="text-sm text-gray-500 line-clamp-2 mb-3">
+                    <p class="text-sm text-gray-500 line-clamp-2 mb-1">
                         {{ product.desc }}
                     </p>
                     
@@ -588,9 +577,22 @@ const formatPrice = (price) => {
     <div class="hidden md:flex">
         <FooterDesktop />
     </div>
+    
 </template>
 
 <style scoped>
+@media screen and (min-width:768px){
+  .section-padding-menu{
+padding-top:1rem;
+}
+}
+@media screen and (max-width:768px){
+  .section-padding-menu{
+padding:0rem;
+}
+}
+
+
 /* Animation for category buttons */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(5px); }

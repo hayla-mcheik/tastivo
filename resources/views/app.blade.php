@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/animate-wow/animate.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/vendor/flatpickr/flatpickr.min.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/6.6.6/css/flag-icons.min.css"/>
-
+<link href="https://cdn.materialdesignicons.com/2.0.46/css/materialdesignicons.min.css" rel="stylesheet">
     <!-- custom CSS -->
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     @vite('resources/js/app.js')
