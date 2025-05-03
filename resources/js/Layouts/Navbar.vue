@@ -145,9 +145,16 @@ const selectSuggestion = (suggestion) => {
                     <div class="">
                         <div class="ul-header-socials">
                             <div class="links">
-                                <a class="text-white" href="#"><i class="fab fa-whatsapp fa-2x"></i></a>
-                                <a class="text-white" href="#"><i class="fab fa-instagram fa-2x"></i></a>
-                                <a class="text-white" href="#"><i class="fab fa-facebook-f fa-2x"></i></a>
+                                <a class="text-white" href="https://wa.me/96178913139" target="_blank">
+  <i class="fab fa-whatsapp fa-2x"></i>
+</a>
+<a class="text-white" href="https://www.instagram.com/" target="_blank">
+  <i class="fab fa-instagram fa-2x"></i>
+</a>
+<a class="text-white" href="https://webgenix.info/" target="_blank">
+  <i class="fas fa-globe fa-2x"></i>
+</a>
+
                             </div>
                         </div>
                     </div>
@@ -218,9 +225,15 @@ const selectSuggestion = (suggestion) => {
             <div class="">
                 <div class="ul-header-socials">
                     <div class="links">
-                        <a class="text-white" href="#"><i class="fab fa-whatsapp fa-2x"></i></a>
-                        <a class="text-white" href="#"><i class="fab fa-instagram fa-2x"></i></a>
-                        <a class="text-white" href="#"><i class="fab fa-facebook-f fa-2x"></i></a>
+                        <a class="text-white" href="https://wa.me/96178913139" target="_blank">
+  <i class="fab fa-whatsapp fa-2x"></i>
+</a>
+<a class="text-white" href="https://www.instagram.com/" target="_blank">
+  <i class="fab fa-instagram fa-2x"></i>
+</a>
+<a class="text-white" href="https://webgenix.info/" target="_blank">
+  <i class="fas fa-globe fa-2x"></i>
+</a>
                     </div>
                 </div>
             </div>

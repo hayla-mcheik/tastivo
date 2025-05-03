@@ -48,21 +48,30 @@ const translatedName = (category) => {
             </div> -->
             
             <div class="row ul-bs-row row-cols-lg-4 row-cols-md-3 row-cols-2 row-cols-xxs-2">
-            <div v-for="category in categories" :key="category.id" class="col">
-                <div class="ul-food p-0 m-0 ">
-                    <div class="ul-food-image w-full " >
-                        <Link :href="`/categories/${category.slug}`" class="block">
-                            <img class="w-full" :src="'/storage/' + category.image" 
-                                 :alt="translatedName(category) + ' Image'">
-                        </Link>
-                    </div>
-                    <div class="ul-food-txt">
-                        <Link :href="`/categories/${category.slug}`" class="ul-food-title py-2 text-uppercase">
-                            {{ translatedName(category) }}
-                        </Link>
-                    </div>
-                </div>
-            </div>
+                <div v-for="category in categories" :key="category.id" class="col">
+  <div class="ul-food p-0 m-0 relative">
+    <div class="ul-food-image w-full">
+      <Link 
+        :href="`/categories/${category.slug}`" 
+        class="block w-full h-full"
+      >
+        <img 
+          class="w-full h-full object-cover"
+          :src="'/storage/' + category.image" 
+          :alt="translatedName(category) + ' Image'"
+        >
+      </Link>
+    </div>
+    <div class="ul-food-txt">
+      <Link 
+        :href="`/categories/${category.slug}`" 
+        class="ul-food-title py-2 text-uppercase"
+      >
+        {{ translatedName(category) }}
+      </Link>
+    </div>
+  </div>
+</div>
         </div>
         
 
@@ -74,5 +83,34 @@ const translatedName = (category) => {
 </template>
 
 <style scoped>
+.ul-food-image {
+  position: relative;
+}
 
+/* ::before pseudo-element */
+.ul-food-image::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.273);
+  z-index: 5; /* Above image but below link */
+  pointer-events: none; /* Allow clicks to pass through */
+}
+
+/* Link styling */
+.ul-food-image a {
+  display: block;
+  position: relative;
+  z-index: 10; /* Above the ::before */
+}
+
+/* Image styling */
+.ul-food-image img {
+  position: relative;
+  z-index: 1;
+  pointer-events: none; /* Let link handle clicks */
+}
 </style>

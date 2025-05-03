@@ -558,7 +558,7 @@ const formatPrice = (price) => {
                href="/"
                 class="px-4 py-2 bg-black text-white rounded-lg hover:bg-black transition-colors"
             >
-                Show All Categories
+                Show All Menu
           </Link>
         </div>
         
