@@ -233,6 +233,7 @@ const formatPrice = (price) => {
 
 
 <template>
+  <Head title="- Menu" />
   <div class="md:hidden">
     <!-- Animated Category Pills -->
     <div class="sticky top-0 z-20 bg-gradient-to-r from-white to-gray-50 shadow-sm backdrop-blur-sm">

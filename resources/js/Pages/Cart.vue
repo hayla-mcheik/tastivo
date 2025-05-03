@@ -121,6 +121,7 @@ const getFullAdditions = (item) => {
 </script>
 
 <template>
+  <Head title="- Cart" />
   <div class="cart-container">
     <!-- Loading State -->
     <div v-if="isLoading" class="loading-overlay">

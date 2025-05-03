@@ -237,6 +237,7 @@ onMounted(() => {
 </script>
 
 <template>
+  <Head title="- Checkout" />
   <div class="max-w-2xl mx-auto p-4 mb-5 md:p-6">
     <!-- Progress Steps -->
     <ol class="flex items-center w-full mb-8">

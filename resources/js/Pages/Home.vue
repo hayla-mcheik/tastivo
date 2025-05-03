@@ -13,6 +13,8 @@ defineProps({
 </script>
 
 <template>
+
+<Head title="- Menu Categories" />
   <!-- Mobile layout -->
   <div class="block md:hidden">
     <Menusliders :categories="categories"/>
